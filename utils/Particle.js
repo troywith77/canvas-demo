@@ -1,4 +1,9 @@
-export default class Particle {
+const width = window.innerWidth
+const height = window.innerHeight
+const random = i => Math.random() * i
+const binRandom = () => Math.random() > 0.5 ? 1 : -1
+
+export class Particle {
   // 坐标x，坐标y，x轴速度，y轴速度，半径
   constructor(x, y, vx, vy, r, color) {
     this.x = x
@@ -6,6 +11,7 @@ export default class Particle {
     this.vx = vx
     this.vy = vy
     this.r = r
+    this.RADIUS = r
     this.color = color
   }
 
@@ -32,4 +38,16 @@ export default class Particle {
     }
     this.draw(c)
   }
+}
+
+export function createParticles(Particle, particleNumber) {
+  return new Array(particleNumber).fill().map(() => {
+    const r = random(10) + 1
+    const x = random(width - r * 2) + r
+    const y = random(height - r * 2) + r
+    const vx = random(5) * binRandom()
+    const vy = random(5) * binRandom()
+    const color = `rgba(${new Array(3).fill().map(i => Math.ceil(random(255))).join(',')}, ${random(1)})`
+    return new Particle(x, y, vx, vy, r, color)
+  })
 }
