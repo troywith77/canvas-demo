@@ -22,7 +22,9 @@
 		const width = canvas.width = window.innerWidth
 		const height = canvas.height = window.innerHeight
 		const random = i => Math.random() * i
+		const binRandom = () => Math.random() > 0.5 ? 1 : -1
 
+		const particleNumber = parseInt(prompt('How many particles would you like to show?', '500'), 10)
 		let particles
 
 		class Particle {
@@ -64,12 +66,12 @@
 		particles = createParticles()
 
 		function createParticles() {
-			return new Array(1000).fill().map(() => {
+			return new Array(particleNumber).fill().map(() => {
 				const r = random(10)
 				const x = random(width - r * 2) + r
 				const y = random(height - r * 2) + r
-				const vx = random(6)
-				const vy = random(6)
+				const vx = random(6) * binRandom()
+				const vy = random(6) * binRandom()
 				const color = `rgba(${new Array(3).fill().map(i => Math.ceil(random(255))).join(',')}, ${random(1)})`
 				return new Particle(x, y, vx, vy, r, color)
 			})
