@@ -1,5 +1,3 @@
-const plusRadius = document.querySelector('#plus-radius')
-const minusRadius = document.querySelector('#minus-radius')
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 let width = canvas.width = window.innerWidth
