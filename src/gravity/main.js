@@ -13,14 +13,7 @@ let mouse = {
   x: width / 2,
   y: height / 2
 }
-const colors = [
-  'rgba(252, 190, 0, x)',
-  'rgba(254, 251, 208, x)',
-  'rgba(255, 129, 0, x)',
-  'rgba(253, 207, 183, x)',
-  'rgba(244, 130, 140, x)',
-  'rgba(255, 47, 0, x)'
-]
+const colors = ['#2B3D54', '#2C5B61', '#247065', '#60A65F', '#FFEC97', '#4A33E8', '#33B0E8', '#A9E8DC']
 
 class Ball {
   constructor(x, y, vx, vy, r, growth) {
@@ -67,13 +60,20 @@ canvas.addEventListener('mousemove', function(e) {
 })
 
 canvas.addEventListener('click', function(e) {
-  balls.push(...new Array(20).fill().map(() => createBall(
+	balls = [...balls.slice(10), ...new Array(20).fill().map(() => createBall(
 		mouse.x,
 		mouse.y,
 		getRandomRange(-10, 10),
 		getRandomRange(-25, 0),
 		getRandomRange(10, 30)
-	)))
+	))]
+  // balls.push(...new Array(20).fill().map(() => createBall(
+	// 	mouse.x,
+	// 	mouse.y,
+	// 	getRandomRange(-10, 10),
+	// 	getRandomRange(-25, 0),
+	// 	getRandomRange(10, 30)
+	// )))
 })
 
 window.addEventListener('resize', () => {
@@ -96,10 +96,6 @@ new Array(200).fill().forEach(() => {
 function animate() {
   c.fillStyle = '#333'
 	c.fillRect(0, 0, width, height)
-	
-	if(balls.length > 300) {
-		balls = balls.slice(100, balls.length)
-	}
   
   balls.forEach((ball) => {
 		ball.update(c)
