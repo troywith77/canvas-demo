@@ -1,3 +1,17 @@
+// 碰撞算法待解决啊啊啊啊
+function intersects(a, b) {
+  return !(
+    b.y + b.r < a.y ||
+    b.y - b.r > a.y + a.h ||
+    b.x + b.r < a.x ||
+    b.x - b.r > a.x + a.w
+  )
+}
+
+function collide(a, b) {
+  return intersects(a, b)
+}
+
 class Game {
   constructor(canvas) {
     this.canvas = canvas
@@ -8,7 +22,18 @@ class Game {
     this.keydowns = {}
     this.gameover = false
   }
+  drawRect(rect) {
+    this.c.fillRect(rect.x, rect.y, rect.w, rect.h)
+  }
+  drawArc(arc) {
+    this.c.beginPath()
+    this.c.arc(arc.x, arc.y, arc.r, 0, Math.PI * 2)
+    this.c.filStyle = '#ddd'
+    this.c.fill()
+    this.c.closePath()
+  }
   animate() {
+    this.c.clearRect(0, 0, game.width, game.height)
     this.update()
     Object.keys(this.actions).forEach((key) => {
       if (this.keydowns[key]) {
@@ -38,32 +63,42 @@ class Game {
   }
 }
 
+class Block {
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+    this.w = 50
+    this.h = 20
+    this.alive = true
+  }
+  kill() {
+    this.alive = false
+  }
+  collide(ball) {
+    return collide(this, ball) 
+  }
+}
+
 class Ball {
   constructor() {
     this.r = 5
-    this.x = 20
-    this.y = 20
+    this.x = 300
+    this.y = 300
     this.vx = 3
     this.vy = -3
   }
   move(game) {
-    if (this.x < 0 || this.x > game.width) {
+    if (this.x < 0 || this.x > 300) {
       this.vx *= -1
     }
-    if (this.y < 0 || this.y > game.height) {
+    if (this.y < 0 || this.y > 400) {
       this.vy *= -1
     }
     this.x += this.vx
     this.y += this.vy
-    this.draw(game)
   }
-  draw(game) {
-    const { c } = game
-    c.beginPath()
-    c.arc(this.x, this.y, this.r, 0, Math.PI * 2)
-    c.filStyle = '#ddd'
-    c.fill()
-    c.closePath()
+  turnAround() {
+    this.vy *= -1
   }
 }
 
@@ -77,23 +112,16 @@ class Paddle {
     this.leftPressed = false
     this.rightPressed = false
   }
-  draw(game) {
-    game.c.fillRect(this.x, this.y, this.w, this.h)
-  }
   moveLeft(game) {
     if (this.x <= 0) return 
     this.x -= this.speed
-    this.draw(game)
   }
   moveRight(game) {
     if (this.x + this.w >= game.width) return
     this.x += this.speed
-    this.draw(game)
   }
   collide(ball) {
-    if (Math.abs(this.y - ball.y) < ball.r && Math.abs(this.x - ball.x) < this.w) {
-      return true
-    }
+    return collide(this, ball)
   }
 }
 
@@ -101,18 +129,32 @@ const __init__ = () => {
   game = new Game(document.querySelector('canvas'))
   paddle = new Paddle()
   ball = new Ball()
+  blocks = new Array(50).fill().map((block, index) => {
+    const blocksPerLine = 300 / 50
+    const modulo = index % blocksPerLine
+    const x = modulo * 50
+    const y = parseInt(index / blocksPerLine, 10) * 20 + 10
+    return new Block(x, y)
+  })
 
   game.update = function() {
-    game.c.clearRect(0, 0, game.width, game.height)
-    paddle.draw(game)
-    ball.move(game)
+    ball.move()
+    game.drawRect(paddle)
+    game.drawArc(ball)
     if (paddle.collide(ball)) {
-      ball.vy *= -1
+      ball.turnAround()
     }
-    if (ball.y > paddle.y + paddle.h) {
-      game.over()
-      alert('game over')
-    }
+    blocks = blocks.filter(block => {
+      if (block.alive) {
+        game.drawRect(block)
+      }
+      if (block.collide(ball)) {
+        block.kill()
+        ball.turnAround()
+        return false
+      }
+      return true
+    })
   }
   
   game.registerAction('a', (...args) => {
