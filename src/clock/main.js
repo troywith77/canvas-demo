@@ -24,6 +24,9 @@ class ClockScale {
     if (this.angle % 5 === 0) {
       // 遇5加粗
       this.lineWidth = 4
+      // 数字
+      this.textX = getXCoor(r - 60, this.angle, x)
+      this.textY = getYCoor(r - 60, this.angle, x)
     }
     if (this.angle % 15 === 0) {
       // 遇15加粗并且加长
@@ -44,6 +47,17 @@ class ClockScale {
     ctx.lineTo(this.endX, this.endY)
     ctx.stroke()
     ctx.closePath()
+    if (this.textX && this.textY) {
+      ctx.beginPath()
+      // ctx.lineWidth = this.lineWidth
+      const text = ctx.measureText(this.angle / 5)
+      ctx.font = '30px Arial'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(this.angle / 5, this.textX - text.width / 2, this.textY)
+      // ctx.fillText(this.endX, this.endY)
+      // ctx.stroke()
+      ctx.closePath()
+    }
   }
 }
 
